@@ -36,46 +36,75 @@ int main() {
 	//}
 
 	//6
-	std::vector<int> letters;
-	std::for_each(alfabet.begin(), alfabet.end(), [&](char& c) { letters.push_back(std::count(bible.begin(), bible.end(), c)); });
+	std::map<char, int> letters;
+	std::for_each(alfabet.begin(), alfabet.end(), [&](const char& c) {letters[c] = std::count(bible.begin(), bible.end(), c); });
 
 	//7.1
-	std::cout << "every amount from a to z: " << std::endl;
-	std::for_each(letters.begin(), letters.end(), [](int& c) {std::cout << c << std::endl; });
+	std::cout << "every indivudual amount from a to z: " << std::endl;
+	std::for_each(letters.begin(), letters.end(), [](const auto & letter ) {std::cout << letter.first << ": " << letter.second << std::endl; });
 	//7.2
 	std::cout << "every amount sorted form a to z: " << std::endl;
-	std::sort(letters.begin(), letters.end());
-	std::for_each(letters.begin(), letters.end(), [](int& c) {std::cout << c << std::endl; });
+	char c;
+	while(letters.size() != 0) {
+		int current_max = 99999999;
+		for (auto i : letters) {
+			if (i.second < current_max) {
+				current_max = i.second;
+				c = i.first;
+			}
+		}
+		std::cout << c << ": " << current_max << "\n";
+		letters.erase(c);
+	}
+	//std::sort(letters.begin(), letters.end());
+	//std::for_each(letters.begin(), letters.end(), [](const auto & letter) { std::cout << letter.first << ": " << letter.second << std::endl; });
 
 	//8
-	std::map<std::string, int> dic;
-	std::ifstream input2("the-king-james-bible.txt");
-	std::string s2;
-	while (input2) {
-		input2 >> s2;
-		if (dic.count(s2) > 0) {
-			dic[s2] ++;
-		}
-		else {
-			dic[s2] = 1;
+	std::map<std::string, int> words;
+	std::string temp;
+	bool flaag = false;
+	for(auto c : bible) {
+		if ('a' <= c && c <= 'z') {
+			flaag = true;
+			temp += c;
+		}else if (flaag) {
+			if (words.count(temp) > 0) {
+				words[temp] ++;
+			}
+			else {
+				words[temp] = 1;
+			}
+			flaag = false;
+			temp = "";
 		}
 	}
+	if (flaag) {
+		if (words.count(temp) > 0) {
+			words[temp] ++;
+		}
+		else {
+			words[temp] = 1;
+		}
+		flaag = false;
+		temp = "";
+	}
 
+	std::cout << "the ten most occuring words are: \n";
 	std::string word;
 	int current_max;
 	for (unsigned int i = 0; i < 10; i++) {
 		current_max = 0;
-		for (auto i : dic) {
-			if (i.second > current_max){
+		for (auto i : words) {
+			if (i.second > current_max) {
 				current_max = i.second;
 				word = i.first;
 			}
 		}
-		std::cout << word << "\n";
-		dic.erase(word);
+		std::cout << word << ": " << current_max << "\n";
+		words.erase(word);
 	}
-	/*
-	for (auto i : dic) {
+	
+	/*for (auto i : words) {
 		std::cout << i.first << " " << i.second << std::endl;
 	}*/
 }
